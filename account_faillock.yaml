@@ -1,0 +1,6 @@
+---
+- name: hardening
+  hosts: redhat
+  become: true
+  roles:
+    - lock_account
