@@ -1,0 +1,132 @@
+---
+# tasks file for ssh_hardening
+- name: ssh hardening
+  hosts: all
+  become: true
+  vars:
+    var_GatewayPorts: "no"
+    var_PermitRootLogin: "no"
+    var_PermitEmptyPasswords: "no"
+    var_X11Forwarding: "no" 
+    var_AllowTcpForwarding: "no"
+
+  tasks:
+
+  - name: Check if oracle file are present
+    stat:
+      paths: "{{ item }}"
+        - /wls
+        - /apps/CA
+        - /tibco
+    register: oracle_files_exists
+
+  - name: Check if /etc/ssh/sshd_config.d exists
+    stat:
+      path: /etc/ssh/sshd_config.d/
+    register: _etc_ssh_sshd_config_d_exists
+
+  - name: List /etc/sshd_config.d/*.conf files selection
+    find:
+      paths: 
+      - /etc/ssh/sshd_config.d/
+      patterns: "*.conf"
+    register: find_ssh_d_files
+    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_sshd_config_d_exists.stat.exists.isdir
+
+  - name: Verify if  backup of files in /etc/ssh/sshd_config.d alredy exists
+    stat:
+      path: "{{ itemp.path }}.before_ssh_hardening.bkp"
+    register: check_sshd_file_name
+    with_items: "{{ find_ssh_d_files.files }}"
+    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_sshd_config_d_exists.stat.exists.isdir
+
+  - name: Verify if backup of /etc/ssh/sshd_config file already exist
+    stat:
+      path: /etc/ssh/sshd_config.before_ssh_hardening.bkp
+    register: check_ssh_file
+
+  - name: take backup of /etc/ssh/sshd_config file
+    copy:
+      src: "/etc/ssh/sshd_config"
+      dest: "/etc/ssh/sshd_config.before_ssh_hardening.bkp"
+      mode: preserve
+      owner: root
+      group: root
+      remote_src: yes
+    when: not check_ssh_file.stat.exists
+
+  - block:
+    - name: Take a backup of files /etc/ssh/sshd_config.d/*conf files
+      copy:
+        src: "{{ item.item.path }}"
+        dest: "{{ item.item.path }}.before_ssh_hardening.bkp"
+        mode: preserve
+        owner: root
+        group: root
+        remote_src: yes
+      with_items: 
+        - "{{ check_sshd_file_name.results }}"
+      when: not item.stat.exists
+    when:
+      - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+
+  - name: Dedulicate parameters in /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+'
+      state: absent
+    with_items:
+      - { key: 'GatewayPorts' }
+      - { key: 'PermitRootLogin' }
+      - { key: 'PermitEmptyPasswords' }
+      - { key: 'X11Forwarding' }
+      - { key: 'AllowTcpForwarding' }
+
+  - name: Check if the parameters are present in /etc/ssh/sshd_config.d/*conf files
+    find:
+      paths: 
+      - /etc/ssh/sshd_config.d/
+      patterns: "*.conf"
+      recurse: 'yes'
+      follow: 'no'
+      contains: (?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+
+    register: _etc_ssh_sshd_config_d_has_parameter
+    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+    with_items:
+      - { key: 'GatewayPorts' }
+      - { key: 'PermitRootLogin' }
+      - { key: 'PermitEmptyPasswords' }
+      - { key: 'X11Forwarding' }
+      - { key: 'AllowTcpForwarding' }
+
+  - name: Remove parameters from /etc/ssh/sshd_config.d/*conf files
+    lineinfile:
+      path: "{{ item.path }}"
+      create: false
+      regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+
+      state: absent
+    with_items: 
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'GatewayPorts' }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'PermitRootLogin' }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'PermitEmptyPasswords' }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'X11Forwarding' }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'AllowTcpForwarding' }
+    when: 
+      - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir  
+
+  - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
+    lineinfile:
+      path: /etc/ssh/sshd_config.d/00-ssh-hardening.conf
+      create: true
+      regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+'
+      line: '{{ item.key }} {{ item.value }}'
+      state: present
+      insertbefore: BOF
+      backup: yes
+    with_items:
+      - { key: 'GatewayPorts', value: '{{ var_GatewayPorts }}' }
+      - { key: 'PermitRootLogin', value: '{{ var_PermitRootLogin }}' }
+      - { key: 'PermitEmptyPasswords', value: '{{ var_PermitEmptyPasswords }}' }
+      - { key: 'X11Forwarding', value: '{{ var_X11Forwarding }}' }
+      - { key: 'AllowTcpForwarding', value: '{{ var_AllowTcpForwarding }}' }  
