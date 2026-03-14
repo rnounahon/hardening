@@ -18,14 +18,14 @@
       - /etc/ssh/sshd_config.d/
       patterns: "*.conf"
     register: find_ssh_d_files
-    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_sshd_config_d_exists.stat.exists.isdir
+    when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
   - name: Verify if  backup of files in /etc/ssh/sshd_config.d alredy exists
     stat:
       path: "{{ itemp.path }}.before_ssh_hardening.bkp"
     register: check_sshd_file_name
     with_items: "{{ find_ssh_d_files.files }}"
-    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_sshd_config_d_exists.stat.exists.isdir
+    when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
   - name: Verify if backup of /etc/ssh/sshd_config file already exist
     stat:
@@ -55,7 +55,7 @@
         - "{{ check_sshd_file_name.results }}"
       when: not item.stat.exists
     when:
-      - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+      - _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
   - name: Deduplicate parameters in /etc/ssh/sshd_config
     lineinfile:
@@ -80,7 +80,7 @@
       follow: 'no'
       contains: (?i)^\s*{{ item.key | regex_escape }}\s+
     register: _etc_ssh_sshd_config_d_has_parameter
-    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+    when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
     with_items:
       - { key: GatewayPorts }
       - { key: PermitRootLogin }
@@ -101,7 +101,7 @@
       - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.files }}', key: X11Forwarding }
       - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.files }}', key: AllowTcpForwarding }
     when: 
-      - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+      - _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
     notify: Restart sshd  
 
   - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
