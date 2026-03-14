@@ -1,10 +1,7 @@
 ---
 # vars file for ssh_hardening
-<<<<<<< HEAD
-var_GatewayPorts: "no"
-var_PermitRootLogin: "no"
-var_PermitEmptyPasswords: "no"
-var_X11Forwarding: "no" 
-var_AllowTcpForwarding: "no"
-=======
->>>>>>> c7e61c549cc8c214edb50dd1a7d4e08a6b80b6d4
+GatewayPorts: "no"
+PermitRootLogin: "no"
+PermitEmptyPasswords: "no"
+X11Forwarding: "no"
+AllowTcpForwarding: "no"
