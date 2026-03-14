@@ -68,6 +68,7 @@
       - { key: 'PermitEmptyPasswords' }
       - { key: 'X11Forwarding' }
       - { key: 'AllowTcpForwarding' }
+    notify: Restart sshd
 
   - name: Check if the parameters are present in /etc/ssh/sshd_config.d/*conf files
     find:
@@ -99,7 +100,8 @@
       - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'X11Forwarding' }
       - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'AllowTcpForwarding' }
     when: 
-      - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir  
+      - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+    notify: Restart sshd  
 
   - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
     lineinfile:
@@ -115,4 +117,5 @@
       - { key: 'PermitRootLogin', value: '{{ var_PermitRootLogin }}' }
       - { key: 'PermitEmptyPasswords', value: '{{ var_PermitEmptyPasswords }}' }
       - { key: 'X11Forwarding', value: '{{ var_X11Forwarding }}' }
-      - { key: 'AllowTcpForwarding', value: '{{ var_AllowTcpForwarding }}' }  
+      - { key: 'AllowTcpForwarding', value: '{{ var_AllowTcpForwarding }}' }
+    notify: Restart sshd  
