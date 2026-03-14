@@ -1,0 +1,57 @@
+  - name: Check if /etc/ssh/sshd_config.d exists
+    stat:
+      path: /etc/ssh/sshd_config.d/
+    register: _etc_ssh_sshd_config_d_exists
+
+  - name: Remove 00-ssh-hardening.conf file
+    ansible.builtin.shell: "rm -f /etc/ssh/sshd_config.d/00-ssh-hardening.conf*"
+    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+  
+  - name: List /etc/ssh/sshd_config.d/*conf files selection
+    find:
+      paths: 
+      - /etc/ssh/sshd_config.d/
+      patterns: "*.conf"
+      recurse: 'yes'
+      file_type: any
+    register: find_ssh_d_files
+    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+
+  - name: Verify if backup of files present in /etc/ssh/sshd_config.d/ exists
+    stat:
+      path: "{{ item }}.before_ssh_hardening.bkp"
+    register: check_sshd_file_name
+    with_items: "{{ find_ssh_d_files.files }}"
+    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+
+  - name: Verify if backup of /etc/ssh/sshd_config file already exist
+    stat:
+      path: /etc/ssh/sshd_config.before_ssh_hardening.bkp
+    register: check_ssh_file
+    
+  - name: Remove /etc/ssh/sshd_config file created by hardening
+    file:
+      path: /etc/ssh/sshd_config
+      state: absent 
+    when: check_ssh_file.stat.exists
+    notify: Restart sshd
+
+  - name: Rename the backed up /etc/ssh/sshd_config.before_ssh_hardening.bkp file to the original one
+    command: "mv /etc/ssh/sshd_config.before_ssh_hardening.bkp /etc/ssh/sshd_config"
+    when: check_ssh_file.stat.exists
+    notify: Restart sshd
+
+  - name: Remove the files created by hardening in /etc/ssh/sshd_config.d/
+    file:
+      path: "{{ item.item.path }}"
+      state: absent
+    with_items: "{{ check_sshd_file_name.results }}"
+    when: item.stat.exists
+    notify: Restart sshd
+
+  - name: Rename the backed up files in /etc/ssh/sshd_config.d/ to the original ones
+    command: "mv {{ item.item.path }}.before_ssh_hardening.bkp {{ item.item.path }}"
+    with_items: "{{ check_sshd_file_name.results }}"
+    when: item.stat.exists
+    notify: Restart sshd
+
