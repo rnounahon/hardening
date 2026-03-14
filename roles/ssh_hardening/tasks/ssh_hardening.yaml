@@ -57,11 +57,11 @@
     when:
       - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
 
-  - name: Dedulicate parameters in /etc/ssh/sshd_config
+  - name: Deduplicate parameters in /etc/ssh/sshd_config
     lineinfile:
       path: /etc/ssh/sshd_config
       create: false
-      regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+'
+      regexp: (?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+
       state: absent
     with_items:
       - { key: GatewayPorts }
