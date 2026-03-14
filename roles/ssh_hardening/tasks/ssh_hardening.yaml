@@ -20,9 +20,9 @@
     register: find_ssh_d_files
     when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
-  - name: Verify if  backup of files in /etc/ssh/sshd_config.d alredy exists
+  - name: Verify if backup of files in /etc/ssh/sshd_config.d already exists
     stat:
-      path: "{{ itemp.path }}.before_ssh_hardening.bkp"
+      path: "{{ item.path }}.before_ssh_hardening.bkp"
     register: check_sshd_file_name
     with_items: "{{ find_ssh_d_files.files }}"
     when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
