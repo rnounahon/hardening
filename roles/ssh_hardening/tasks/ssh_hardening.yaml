@@ -1,10 +1,11 @@
   - name: Check if oracle file are present
     stat:
       paths: "{{ item }}"
-        - /wls
-        - /apps/CA
-        - /tibco
     register: oracle_files_exists
+    with_items:
+      - /wls
+      - /apps/CA
+      - /tibco
 
   - name: Check if /etc/ssh/sshd_config.d exists
     stat:
