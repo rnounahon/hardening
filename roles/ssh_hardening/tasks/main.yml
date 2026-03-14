@@ -2,3 +2,8 @@
 # tasks file for ssh_hardening
 - name: include new task.
   include_tasks: ssh_hardening.yaml
+  tags: hardening
+
+- name: include new task.
+  include_tasks: ssh_hardening_rollback.yaml
+  tags: rollback
