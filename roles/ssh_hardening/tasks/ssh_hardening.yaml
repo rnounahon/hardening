@@ -1,6 +1,6 @@
   - name: Check if oracle file are present
     stat:
-      paths: "{{ item }}"
+      path: "{{ item }}"
     register: oracle_files_exists
     with_items:
       - /wls
@@ -14,7 +14,7 @@
 
   - name: List /etc/sshd_config.d/*.conf files selection
     find:
-      paths: 
+      path: 
       - /etc/ssh/sshd_config.d/
       patterns: "*.conf"
     register: find_ssh_d_files
