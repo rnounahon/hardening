@@ -61,7 +61,7 @@
     lineinfile:
       path: /etc/ssh/sshd_config
       create: false
-      regexp: (?i)(?i)^\s*{{ '{{ item.key }}'| regex_escape }}\s+
+      regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
       state: absent
     with_items:
       - { key: GatewayPorts }
@@ -78,7 +78,7 @@
       patterns: "*.conf"
       recurse: 'yes'
       follow: 'no'
-      contains: (?i)^\s*{{ '{{ item.key }}'| regex_escape }}\s+
+      contains: (?i)^\s*{{ item.key | regex_escape }}\s+
     register: _etc_ssh_sshd_config_d_has_parameter
     when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
     with_items:
@@ -92,7 +92,7 @@
     lineinfile:
       path: "{{ item.path }}"
       create: false
-      regexp: (?i)(?i)^\s*{{ '{{ item.key }}'| regex_escape }}\s+
+      regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
       state: absent
     with_items: 
       - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.files }}', key: GatewayPorts }
@@ -108,7 +108,7 @@
     lineinfile:
       path: /etc/ssh/sshd_config.d/00-ssh-hardening.conf
       create: true
-      regexp: (?i)(?i)^\s*{{ '{{ item.key }}'| regex_escape }}\s+
+      regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
       line: "{{ item.key }} {{ item.value }}"
     with_items:
       - { key: GatewayPorts, value: '{{ var_GatewayPorts }}' }
@@ -116,4 +116,4 @@
       - { key: PermitEmptyPasswords, value: '{{ var_PermitEmptyPasswords }}' }
       - { key: X11Forwarding, value: '{{ var_X11Forwarding }}'}
       - { key: AllowTcpForwarding, value: '{{ var_AllowTcpForwarding }}' }
-    notify: Restart sshd  
+    notify: Restart sshd 
