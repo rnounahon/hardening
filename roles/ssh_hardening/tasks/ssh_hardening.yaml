@@ -64,11 +64,11 @@
       regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+'
       state: absent
     with_items:
-      - { key: 'GatewayPorts' }
-      - { key: 'PermitRootLogin' }
-      - { key: 'PermitEmptyPasswords' }
-      - { key: 'X11Forwarding' }
-      - { key: 'AllowTcpForwarding' }
+      - { key: GatewayPorts }
+      - { key: PermitRootLogin }
+      - { key: PermitEmptyPasswords }
+      - { key: X11Forwarding }
+      - { key: AllowTcpForwarding }
     notify: Restart sshd
 
   - name: Check if the parameters are present in /etc/ssh/sshd_config.d/*conf files
@@ -82,11 +82,11 @@
     register: _etc_ssh_sshd_config_d_has_parameter
     when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
     with_items:
-      - { key: 'GatewayPorts' }
-      - { key: 'PermitRootLogin' }
-      - { key: 'PermitEmptyPasswords' }
-      - { key: 'X11Forwarding' }
-      - { key: 'AllowTcpForwarding' }
+      - { key: GatewayPorts }
+      - { key: PermitRootLogin }
+      - { key: PermitEmptyPasswords }
+      - { key: X11Forwarding }
+      - { key: AllowTcpForwarding }
 
   - name: Remove parameters from /etc/ssh/sshd_config.d/*conf files
     lineinfile:
@@ -95,11 +95,11 @@
       regexp: (?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+
       state: absent
     with_items: 
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "GatewayPorts" }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "PermitRootLogin" }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "PermitEmptyPasswords" }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "X11Forwarding" }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "AllowTcpForwarding" }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: GatewayPorts }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: PermitRootLogin }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: PermitEmptyPasswords }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: X11Forwarding }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: AllowTcpForwarding }
     when: 
       - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
     notify: Restart sshd  
@@ -114,9 +114,9 @@
       insertbefore: BOF
       backup: yes
     with_items:
-      - { key: "GatewayPorts", value: "{{ var_GatewayPorts }}" }
-      - { key: "PermitRootLogin", value: "{{ var_PermitRootLogin }}" }
-      - { key: "PermitEmptyPasswords", value: "{{ var_PermitEmptyPasswords }}" }
-      - { key: "X11Forwarding", value: "{{ var_X11Forwarding }}" }
-      - { key: "AllowTcpForwarding", value: "{{ var_AllowTcpForwarding }}" }
+      - { key: GatewayPorts, value: "{{ var_GatewayPorts }}" }
+      - { key: PermitRootLogin, value: "{{ var_PermitRootLogin }}" }
+      - { key: PermitEmptyPasswords, value: "{{ var_PermitEmptyPasswords }}" }
+      - { key: X11Forwarding, value: "{{ var_X11Forwarding }}" }
+      - { key: AllowTcpForwarding, value: "{{ var_AllowTcpForwarding }}" }
     notify: Restart sshd  
