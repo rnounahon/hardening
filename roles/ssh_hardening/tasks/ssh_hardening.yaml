@@ -95,11 +95,11 @@
       regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+
       state: absent
     with_items: 
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'GatewayPorts' }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'PermitRootLogin' }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'PermitEmptyPasswords' }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'X11Forwarding' }
-      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: 'AllowTcpForwarding' }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "GatewayPorts" }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "PermitRootLogin" }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "PermitEmptyPasswords" }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "X11Forwarding" }
+      - { path: "{{ _etc_ssh_sshd_config_d_has_parameter.files }}", key: "AllowTcpForwarding" }
     when: 
       - _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
     notify: Restart sshd  
