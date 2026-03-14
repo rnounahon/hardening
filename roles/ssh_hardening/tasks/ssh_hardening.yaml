@@ -106,8 +106,9 @@
 
   - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
     lineinfile:
+      path: /etc/ssh/sshd_config.d/00-ssh-hardening.conf
       create: true
-      regexp: (?i)(?i)^\s*{{ "{{ item.key }}"| regex_escape }}\s+
+      regexp: (?i)(?i)^\s*{{ '{{ item.key }}'| regex_escape }}\s+
       line: "{{ item.key }} {{ item.value }}"
     with_items:
       - { key: GatewayPorts, value: '{{ var_GatewayPorts }}' }
