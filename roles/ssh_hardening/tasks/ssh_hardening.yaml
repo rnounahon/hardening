@@ -109,14 +109,14 @@
       path: /etc/ssh/sshd_config.d/00-ssh-hardening.conf
       create: true
       regexp: '(?i)(?i)^\s*{{ "{{ item.key }}" | regex_escape }}\s+'
-      line: '{{ item.key }} {{ item.value }}'
+      line: '"{{ item.key }}" "{{ item.value }}"'
       state: present
       insertbefore: BOF
       backup: yes
     with_items:
-      - { key: 'GatewayPorts', value: '{{ var_GatewayPorts }}' }
-      - { key: 'PermitRootLogin', value: '{{ var_PermitRootLogin }}' }
-      - { key: 'PermitEmptyPasswords', value: '{{ var_PermitEmptyPasswords }}' }
-      - { key: 'X11Forwarding', value: '{{ var_X11Forwarding }}' }
-      - { key: 'AllowTcpForwarding', value: '{{ var_AllowTcpForwarding }}' }
+      - { key: "GatewayPorts", value: "{{ var_GatewayPorts }}" }
+      - { key: "PermitRootLogin", value: "{{ var_PermitRootLogin }}" }
+      - { key: "PermitEmptyPasswords", value: "{{ var_PermitEmptyPasswords }}" }
+      - { key: "X11Forwarding", value: "{{ var_X11Forwarding }}" }
+      - { key: "AllowTcpForwarding", value: "{{ var_AllowTcpForwarding }}" }
     notify: Restart sshd  
