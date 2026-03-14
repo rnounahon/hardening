@@ -5,7 +5,7 @@
 
   - name: Remove 00-ssh-hardening.conf file
     ansible.builtin.shell: "rm -f /etc/ssh/sshd_config.d/00-ssh-hardening.conf*"
-    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+    when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
   
   - name: List /etc/ssh/sshd_config.d/*conf files selection
     find:
@@ -15,14 +15,14 @@
       recurse: 'yes'
       file_type: any
     register: find_ssh_d_files
-    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+    when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
   - name: Verify if backup of files present in /etc/ssh/sshd_config.d/ exists
     stat:
       path: "{{ item }}.before_ssh_hardening.bkp"
     register: check_sshd_file_name
     with_items: "{{ find_ssh_d_files.files }}"
-    when: _etc_ssh_sshd_config_d_exists.stat.exists.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.exists.isdir
+    when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
   - name: Verify if backup of /etc/ssh/sshd_config file already exist
     stat:
