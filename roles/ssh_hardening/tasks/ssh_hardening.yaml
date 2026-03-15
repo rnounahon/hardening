@@ -88,6 +88,10 @@
       - { key: X11Forwarding }
       - { key: AllowTcpForwarding }
 
+  - name: show
+    debug:
+      var: _etc_ssh_sshd_config_d_has_parameter
+
   - name: Remove parameters from /etc/ssh/sshd_config.d/*conf files
     lineinfile:
       path: "{{ item.path }}"
