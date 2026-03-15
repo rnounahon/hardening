@@ -13,7 +13,6 @@
       - /etc/ssh/sshd_config.d/
       patterns: "*.conf"
       recurse: 'yes'
-      file_type: any
     register: find_ssh_d_files
     when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
@@ -43,9 +42,9 @@
 
   - name: Remove the files created by hardening in /etc/ssh/sshd_config.d/
     file:
-      path: "{{ item.item.path }}"
+      path: "{{ item.path }}"
       state: absent
-    with_items: "{{ check_sshd_file_name.results }}"
+    with_items: "{{ find_ssh_d_files.files }}"
     when: item.stat.exists
     notify: Restart sshd
 
