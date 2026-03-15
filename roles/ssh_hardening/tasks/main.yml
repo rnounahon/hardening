@@ -2,10 +2,10 @@
 # tasks file for ssh_hardening
 - name: Configure ssh hardening.
   include_tasks: ssh_hardening.yaml
-#  tags: 
-#    - hardening
-#
-#- name: Rollback ssh hardening.
-#  include_tasks: ssh_hardening_rollback.yaml
-#  tags: 
-#    - rollback
+  tags: 
+    - hardening
+
+- name: Rollback ssh hardening.
+  include_tasks: ssh_hardening_rollback.yaml
+  tags: 
+    - rollback
