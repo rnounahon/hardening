@@ -95,11 +95,11 @@
       regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
       state: absent
     with_items: 
-      - { item.path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: GatewayPorts }
-      - { item.path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: PermitRootLogin }
-      - { item.path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: PermitEmptyPasswords }
-      - { item.path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: X11Forwarding }
-      - { item.path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: AllowTcpForwarding }
+      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: GatewayPorts }
+      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: PermitRootLogin }
+      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: PermitEmptyPasswords }
+      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: X11Forwarding }
+      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results }}', key: AllowTcpForwarding }
 
     when: 
       - _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
