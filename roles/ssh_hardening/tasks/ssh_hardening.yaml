@@ -93,7 +93,7 @@
       path: "{{ item.0.path }}"
       regexp: "(?i)^\\s*{{ item.1 }}\\s+"
       state: absent
-    loop: "{{ _etc_ssh_sshd_config_d_has_parameter.files | product(ssh_params) | list }}"
+    loop: "{{ _etc_ssh_sshd_config_d_has_parameter.results | map(attribute='files')| flatten| map(attribute='path')| unique | product(ssh_params) | list }}"
     vars:
       ssh_params:
         - GatewayPorts
