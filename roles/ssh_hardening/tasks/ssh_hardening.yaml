@@ -88,22 +88,19 @@
       - { key: X11Forwarding }
       - { key: AllowTcpForwarding }
 
-  - name: show
-    debug:
-      var: _etc_ssh_sshd_config_d_has_parameter
-
-  - name: Remove parameters from /etc/ssh/sshd_config.d/*conf files
+  - name: Remove ssh parameters
     lineinfile:
-      path: "{{ item.path }}"
-      create: false
-      regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
+      path: "{{ item.0.path }}"
+      regexp: "(?i)^\\s*{{ item.1 }}\\s+"
       state: absent
-    with_items: 
-      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results.path }}', key: GatewayPorts }
-      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results.path }}', key: PermitRootLogin }
-      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results.path }}', key: PermitEmptyPasswords }
-      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results.path }}', key: X11Forwarding }
-      - { path: '{{ _etc_ssh_sshd_config_d_has_parameter.results.path }}', key: AllowTcpForwarding }
+    loop: "{{ ssh_conf_files_etc_ssh_sshd_config_d_has_parameter.files | product(ssh_params) | list }}"
+    vars:
+      ssh_params:
+        - GatewayPorts
+        - PermitRootLogin
+        - PermitEmptyPasswords
+        - X11Forwarding
+        - AllowTcpForwarding
     when: 
       - _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
     notify: Restart sshd  
