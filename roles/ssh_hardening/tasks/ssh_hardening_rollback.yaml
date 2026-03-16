@@ -13,6 +13,7 @@
       - /etc/ssh/sshd_config.d/
       patterns: "*.conf"
       recurse: 'yes'
+      file_type: any
     register: find_ssh_d_files
     when: _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
 
@@ -36,20 +37,21 @@
     notify: Restart sshd
 
   - name: Rename the backed up /etc/ssh/sshd_config.before_ssh_hardening.bkp file to the original one
-    command: "mv /etc/ssh/sshd_config.before_ssh_hardening.bkp /etc/ssh/sshd_config"
+    command: mv /etc/ssh/sshd_config.before_ssh_hardening.bkp /etc/ssh/sshd_config
     when: check_ssh_file.stat.exists
     notify: Restart sshd
 
   - name: Remove the files created by hardening in /etc/ssh/sshd_config.d/
     file:
-      path: "{{ item.path }}"
+      path: "{{ item.item.path }}"
       state: absent
-    with_items: "{{ find_ssh_d_files.files }}"
+    with_items: 
+      - "{{ check_sshd_file_name.results }}"
     when: item.stat.exists
     notify: Restart sshd
 
   - name: Rename the backed up files in /etc/ssh/sshd_config.d/ to the original ones
-    command: "mv {{ item.item.path }}.before_ssh_hardening.bkp {{ item.item.path }}"
+    command: mv "{{ item.item.path }}.before_ssh_hardening.bkp" "{{ item.item.path }}"
     with_items: "{{ check_sshd_file_name.results }}"
     when: item.stat.exists
     notify: Restart sshd
