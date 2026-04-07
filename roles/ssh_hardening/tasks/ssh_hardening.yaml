@@ -107,3 +107,18 @@
       - { key: X11Forwarding, value: '{{ var_X11Forwarding }}'}
       - { key: AllowTcpForwarding, value: '{{ var_AllowTcpForwarding }}' }
     notify: Restart sshd 
+
+
+  - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
+      line: "{{ item.key }} {{ item.value }}"
+    with_items:
+      - { key: GatewayPorts, value: '{{ var_GatewayPorts }}' }
+      - { key: PermitRootLogin, value: '{{ var_PermitRootLogin }}' }
+      - { key: PermitEmptyPasswords, value: '{{ var_PermitEmptyPasswords }}' }
+      - { key: X11Forwarding, value: '{{ var_X11Forwarding }}'}
+      - { key: AllowTcpForwarding, value: '{{ var_AllowTcpForwarding }}' }
+    notify: Restart sshd 
+    when: ansible_facts['distribution'] == 'Red Hat' and ansible_facts['distribution_major_version'] == '7'
