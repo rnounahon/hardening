@@ -94,7 +94,7 @@
       - _etc_ssh_sshd_config_d_exists.stat.isdir is defined and _etc_ssh_sshd_config_d_exists.stat.isdir
     notify: Restart sshd  
 
-  - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
+  - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file when Os is Red Hat 8 or higher
     lineinfile:
       path: /etc/ssh/sshd_config.d/00-ssh-hardening.conf
       create: true
@@ -106,10 +106,11 @@
       - { key: PermitEmptyPasswords, value: '{{ var_PermitEmptyPasswords }}' }
       - { key: X11Forwarding, value: '{{ var_X11Forwarding }}'}
       - { key: AllowTcpForwarding, value: '{{ var_AllowTcpForwarding }}' }
-    notify: Restart sshd 
+    notify: Restart sshd
+    when: ansible_facts['distribution'] == 'Red Hat' and ansible_facts['distribution_major_version'] > '7'
 
 
-  - name: Insert correct parameters in /etc/ssh/sshd_config.d/00-ssh-hardening.conf file
+  - name: Insert correct parameters in /etc/ssh/sshd_config file when Os is Red Hat 7
     lineinfile:
       path: /etc/ssh/sshd_config
       regexp: (?i)(?i)^\s*{{ item.key | regex_escape }}\s+
