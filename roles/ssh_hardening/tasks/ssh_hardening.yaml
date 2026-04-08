@@ -107,7 +107,7 @@
       - { key: X11Forwarding, value: '{{ var_X11Forwarding }}'}
       - { key: AllowTcpForwarding, value: '{{ var_AllowTcpForwarding }}' }
     notify: Restart sshd
-    when: ansible_facts['distribution'] == 'Red Hat' and ansible_facts['distribution_major_version'] > '7'
+    when: ansible_facts['distribution'] == 'RedHat' and ansible_facts['distribution_major_version'] > '7'
 
 
   - name: Insert correct parameters in /etc/ssh/sshd_config file when Os is Red Hat 7
@@ -122,4 +122,4 @@
       - { key: X11Forwarding, value: '{{ var_X11Forwarding }}'}
       - { key: AllowTcpForwarding, value: '{{ var_AllowTcpForwarding }}' }
     notify: Restart sshd 
-    when: ansible_facts['distribution'] == 'Red Hat' and ansible_facts['distribution_major_version'] == '7'
+    when: ansible_facts['distribution'] == 'RedHat' and ansible_facts['distribution_major_version'] == '7'
