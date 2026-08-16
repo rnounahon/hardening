@@ -1,0 +1,15 @@
+---
+- name: Appliquer les paramètres sysctl
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/99-rhel10-hardening.conf
+  loop: "{{ sysctl_settings | combine(sysctl_extra_settings) | dict2items }}"
+  when: hardening_mode == "enforce"
+
+- name: Vérifier les paramètres
+  ansible.builtin.command: sysctl -a
+  changed_when: false
+  failed_when: false

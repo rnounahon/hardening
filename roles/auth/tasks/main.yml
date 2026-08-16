@@ -1,0 +1,10 @@
+---
+- name: Rapport sur authselect
+  ansible.builtin.command: authselect current
+  register: authselect_current
+  changed_when: false
+  failed_when: false
+
+- name: Afficher le profil authselect
+  ansible.builtin.debug:
+    var: authselect_current.stdout

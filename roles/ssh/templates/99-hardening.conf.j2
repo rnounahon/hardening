@@ -1,0 +1,8 @@
+# Managed by Ansible - RHEL10 hardening
+PermitRootLogin {{ ssh_permit_root_login }}
+PasswordAuthentication {{ ssh_password_authentication | ternary('yes', 'no') }}
+MaxAuthTries {{ ssh_max_auth_tries }}
+ClientAliveInterval {{ ssh_client_alive_interval }}
+ClientAliveCountMax {{ ssh_client_alive_count_max }}
+X11Forwarding {{ ssh_x11_forwarding | ternary('yes', 'no') }}
+MaxSessions {{ ssh_max_sessions }}

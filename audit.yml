@@ -1,0 +1,43 @@
+---
+- name: RHEL 10 hardening - audit
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Vérifier RHEL 10
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == "RedHat"
+          - ansible_facts.distribution_major_version | int == 10
+        fail_msg: "Cet hôte n'est pas RHEL 10."
+
+  roles:
+    - role: baseline
+      tags: [baseline]
+    - role: packages
+      tags: [packages]
+    - role: services
+      tags: [services]
+    - role: selinux
+      tags: [selinux]
+    - role: chrony
+      tags: [chrony]
+    - role: ssh
+      tags: [ssh]
+    - role: sudo
+      tags: [sudo]
+    - role: auth
+      tags: [auth]
+    - role: auditd
+      tags: [auditd]
+    - role: journald
+      tags: [journald]
+    - role: firewall
+      tags: [firewall]
+    - role: sysctl
+      tags: [sysctl]
+    - role: filesystem
+      tags: [filesystem]
+    - role: crypto
+      tags: [crypto]

@@ -1,0 +1,6 @@
+---
+- name: Configurer SELinux
+  ansible.posix.selinux:
+    policy: "{{ selinux_policy }}"
+    state: "{{ selinux_state }}"
+  when: hardening_mode == "enforce"

@@ -1,0 +1,13 @@
+---
+- name: Vérifier la crypto policy
+  ansible.builtin.command: update-crypto-policies --show
+  register: crypto_current
+  changed_when: false
+  failed_when: false
+
+- name: Appliquer la crypto policy
+  ansible.builtin.command: "update-crypto-policies --set {{ crypto_policy }}"
+  when:
+    - hardening_mode == "enforce"
+    - crypto_policy | length > 0
+    - crypto_current.stdout.strip() != crypto_policy

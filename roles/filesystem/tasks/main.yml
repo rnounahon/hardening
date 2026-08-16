@@ -1,0 +1,9 @@
+---
+- name: Vérifier les montages
+  ansible.builtin.command: findmnt --kernel
+  register: mounts
+  changed_when: false
+
+- name: Afficher les montages pour audit
+  ansible.builtin.debug:
+    var: mounts.stdout_lines

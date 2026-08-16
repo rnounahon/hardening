@@ -1,0 +1,13 @@
+---
+- name: RHEL 10 hardening - rollback des sauvegardes disponibles
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Information
+      ansible.builtin.debug:
+        msg: >
+          Le rollback complet n'est pas automatique. Les rôles doivent sauvegarder
+          les fichiers sensibles avant modification. Restaurer uniquement après
+          validation du fichier et de l'état du service.

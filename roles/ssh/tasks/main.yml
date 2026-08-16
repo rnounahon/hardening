@@ -1,0 +1,19 @@
+---
+- name: Vérifier la configuration SSH avant modification
+  ansible.builtin.command: sshd -t
+  changed_when: false
+
+- name: Déployer la configuration de durcissement SSH
+  ansible.builtin.template:
+    src: 99-hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/99-hardening.conf
+    owner: root
+    group: root
+    mode: "0600"
+    backup: "{{ backup_configs }}"
+  notify: Restart sshd
+  when: hardening_mode == "enforce"
+
+- name: Vérifier sshd_config
+  ansible.builtin.command: sshd -t
+  changed_when: false

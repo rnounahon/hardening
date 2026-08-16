@@ -1,0 +1,16 @@
+---
+- name: Mettre à jour les métadonnées DNF
+  ansible.builtin.dnf:
+    update_cache: true
+  when: hardening_mode == "enforce"
+
+- name: Installer les paquets de base
+  ansible.builtin.dnf:
+    name:
+      - audit
+      - firewalld
+      - chrony
+      - policycoreutils
+      - policycoreutils-python-utils
+    state: present
+  when: hardening_mode == "enforce"

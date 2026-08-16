@@ -1,0 +1,42 @@
+---
+- name: Installer et démarrer firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: true
+    state: started
+  when:
+    - hardening_mode == "enforce"
+    - firewall_enabled
+
+- name: Configurer la zone par défaut
+  ansible.posix.firewalld:
+    zone: "{{ firewall_default_zone }}"
+    state: present
+    permanent: true
+  when:
+    - hardening_mode == "enforce"
+    - firewall_enabled
+
+- name: Autoriser les services nécessaires
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    zone: "{{ firewall_default_zone }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ firewall_allowed_services }}"
+  when:
+    - hardening_mode == "enforce"
+    - firewall_enabled
+
+- name: Autoriser les ports explicitement déclarés
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    zone: "{{ firewall_default_zone }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ firewall_allowed_ports }}"
+  when:
+    - hardening_mode == "enforce"
+    - firewall_enabled

@@ -1,0 +1,5 @@
+---
+auditd_max_log_file: 50
+auditd_num_logs: 5
+auditd_space_left_action: SYSLOG
+auditd_admin_space_left_action: SUSPEND

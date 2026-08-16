@@ -1,0 +1,38 @@
+---
+- name: RHEL 10 hardening - enforce
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Vérifier RHEL 10
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == "RedHat"
+          - ansible_facts.distribution_major_version | int == 10
+        fail_msg: "Cet hôte n'est pas RHEL 10."
+
+    - name: Afficher le mode
+      ansible.builtin.debug:
+        msg: "Hardening mode={{ hardening_mode }}"
+
+  roles:
+    - role: baseline
+    - role: packages
+    - role: services
+    - role: selinux
+    - role: chrony
+    - role: ssh
+    - role: sudo
+    - role: auth
+    - role: auditd
+    - role: journald
+    - role: firewall
+    - role: sysctl
+    - role: filesystem
+    - role: crypto
+
+  post_tasks:
+    - name: Rapport final
+      ansible.builtin.debug:
+        msg: "Hardening RHEL 10 terminé."

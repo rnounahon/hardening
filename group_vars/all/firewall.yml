@@ -1,0 +1,3 @@
+---
+# Ports additionnels à autoriser après validation applicative.
+firewall_allowed_ports: []

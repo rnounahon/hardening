@@ -1,0 +1,7 @@
+---
+# PAM/authselect doit être adapté à la méthode d'authentification réelle.
+authselect_profile: null
+password_min_length: 14
+password_max_days: 365
+password_min_days: 1
+password_warn_days: 7

@@ -1,0 +1,48 @@
+---
+hardening_mode: enforce
+
+# Sécurité d'exploitation
+reboot_allowed: false
+backup_configs: true
+
+# SSH
+ssh_permit_root_login: "no"
+ssh_password_authentication: false
+ssh_max_auth_tries: 4
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+
+# Services
+disable_services:
+  - telnet.socket
+  - rsh.socket
+  - rlogin.socket
+
+# Firewall
+firewall_enabled: true
+firewall_default_zone: public
+firewall_allowed_services:
+  - ssh
+
+# SELinux
+selinux_state: enforcing
+selinux_policy: targeted
+
+# Chrony
+chrony_servers:
+  - pool.ntp.org
+
+# Sysctl
+sysctl_settings:
+  net.ipv4.ip_forward: 0
+  net.ipv4.conf.all.accept_redirects: 0
+  net.ipv4.conf.default.accept_redirects: 0
+  net.ipv4.conf.all.send_redirects: 0
+  net.ipv4.conf.default.send_redirects: 0
+  net.ipv4.conf.all.accept_source_route: 0
+  net.ipv4.conf.default.accept_source_route: 0
+  net.ipv4.conf.all.rp_filter: 1
+  net.ipv4.conf.default.rp_filter: 1
+
+# Crypto policy : ne pas imposer FIPS ici sans étude préalable.
+crypto_policy: DEFAULT

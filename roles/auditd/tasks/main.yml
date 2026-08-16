@@ -1,0 +1,21 @@
+---
+- name: Configurer auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: "^{{ item.key }}\\s*="
+    line: "{{ item.key }} = {{ item.value }}"
+    backup: "{{ backup_configs }}"
+  loop:
+    - { key: "max_log_file", value: "{{ auditd_max_log_file }}" }
+    - { key: "num_logs", value: "{{ auditd_num_logs }}" }
+    - { key: "space_left_action", value: "{{ auditd_space_left_action }}" }
+    - { key: "admin_space_left_action", value: "{{ auditd_admin_space_left_action }}" }
+  notify: Restart auditd
+  when: hardening_mode == "enforce"
+
+- name: Activer auditd
+  ansible.builtin.systemd:
+    name: auditd
+    enabled: true
+    state: started
+  when: hardening_mode == "enforce"

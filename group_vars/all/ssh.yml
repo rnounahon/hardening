@@ -1,0 +1,5 @@
+---
+# Variables SSH supplémentaires.
+# Adapter selon bastion, comptes techniques et méthodes d'administration.
+ssh_x11_forwarding: false
+ssh_max_sessions: 10

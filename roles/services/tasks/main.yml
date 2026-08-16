@@ -1,0 +1,14 @@
+---
+- name: Vérifier les services à désactiver
+  ansible.builtin.service_facts:
+
+- name: Désactiver les services inutiles présents
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+    masked: true
+  loop: "{{ disable_services }}"
+  when:
+    - hardening_mode == "enforce"
+    - item in ansible_facts.services

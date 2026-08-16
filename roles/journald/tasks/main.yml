@@ -1,0 +1,13 @@
+---
+- name: Créer le répertoire de journald persistant
+  ansible.builtin.file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: root
+    mode: "02755"
+  when: hardening_mode == "enforce"
+
+- name: Vérifier journald
+  ansible.builtin.command: journalctl --disk-usage
+  changed_when: false
