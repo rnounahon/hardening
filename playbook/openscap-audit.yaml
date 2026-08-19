@@ -1,0 +1,181 @@
+---
+- name: RHEL 10 - CIS Level 2 - OpenSCAP Audit
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    scap_content: "/usr/share/xml/scap/ssg/content/ssg-rhel10-ds.xml"
+
+    scap_profile: "xccdf_org.ssgproject.content_profile_cis"
+
+    scap_results_dir: "/var/tmp/openscap"
+
+    scap_results_file: "{{ scap_results_dir }}/rhel10-cis-results.xml"
+
+    scap_report_file: "{{ scap_results_dir }}/rhel10-cis-report.html"
+
+  tasks:
+
+    # ---------------------------------------------------------
+    # SYSTEM CHECK
+    # ---------------------------------------------------------
+
+    - name: Vérifier que le système est RHEL 10
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == "RedHat"
+          - ansible_facts.distribution_major_version | int == 10
+        fail_msg: >
+          Ce playbook nécessite RHEL 10.
+          Système détecté :
+          {{ ansible_facts.distribution }}
+          {{ ansible_facts.distribution_version }}
+
+    # ---------------------------------------------------------
+    # OPENSCAP CHECK
+    # ---------------------------------------------------------
+
+    - name: Vérifier la présence de oscap
+      ansible.builtin.command:
+        cmd: oscap -V
+      register: oscap_version
+      changed_when: false
+
+    - name: Afficher la version OpenSCAP
+      ansible.builtin.debug:
+        var: oscap_version.stdout_lines
+
+    - name: Vérifier la présence du datastream
+      ansible.builtin.stat:
+        path: "{{ scap_content }}"
+      register: scap_datastream
+
+    - name: Arrêter si le datastream est absent
+      ansible.builtin.assert:
+        that:
+          - scap_datastream.stat.exists
+        fail_msg: >
+          Le datastream SCAP est absent :
+          {{ scap_content }}
+
+    # ---------------------------------------------------------
+    # PROFILE CHECK
+    # ---------------------------------------------------------
+
+    - name: Vérifier que le profil CIS existe
+      ansible.builtin.command:
+        cmd: >
+          oscap info
+          {{ scap_content }}
+      register: oscap_info
+      changed_when: false
+
+    - name: Vérifier la présence du profil CIS
+      ansible.builtin.assert:
+        that:
+          - scap_profile in oscap_info.stdout
+        fail_msg: >
+          Le profil {{ scap_profile }} n'existe pas
+          dans {{ scap_content }}.
+
+    # ---------------------------------------------------------
+    # RESULTS DIRECTORY
+    # ---------------------------------------------------------
+
+    - name: Créer le répertoire des résultats
+      ansible.builtin.file:
+        path: "{{ scap_results_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    # ---------------------------------------------------------
+    # OPENSCAP AUDIT
+    # ---------------------------------------------------------
+
+    - name: Exécuter l'audit CIS Level 2
+      ansible.builtin.command:
+        cmd: >
+          oscap xccdf eval
+          --profile {{ scap_profile }}
+          --results {{ scap_results_file }}
+          --report {{ scap_report_file }}
+          {{ scap_content }}
+      register: openscap_result
+      changed_when: false
+      failed_when: false
+
+    # ---------------------------------------------------------
+    # DISPLAY RESULT
+    # ---------------------------------------------------------
+
+    - name: Afficher le code retour OpenSCAP
+      ansible.builtin.debug:
+        msg:
+          - "OpenSCAP return code : {{ openscap_result.rc }}"
+          - "Profile : {{ scap_profile }}"
+
+    - name: Afficher la sortie OpenSCAP
+      ansible.builtin.debug:
+        var: openscap_result.stdout_lines
+
+    - name: Afficher les erreurs OpenSCAP
+      ansible.builtin.debug:
+        var: openscap_result.stderr_lines
+
+    # ---------------------------------------------------------
+    # CHECK RESULT FILES
+    # ---------------------------------------------------------
+
+    - name: Vérifier le rapport XML
+      ansible.builtin.stat:
+        path: "{{ scap_results_file }}"
+      register: scap_xml
+
+    - name: Vérifier le rapport HTML
+      ansible.builtin.stat:
+        path: "{{ scap_report_file }}"
+      register: scap_html
+
+    - name: Vérifier que les rapports existent
+      ansible.builtin.assert:
+        that:
+          - scap_xml.stat.exists
+          - scap_html.stat.exists
+        fail_msg: >
+          Les rapports OpenSCAP n'ont pas été générés correctement.
+
+    # ---------------------------------------------------------
+    # DOWNLOAD REPORTS TO AWX
+    # ---------------------------------------------------------
+
+    - name: Récupérer le rapport HTML
+      ansible.builtin.fetch:
+        src: "{{ scap_report_file }}"
+        dest: "./artifacts/{{ inventory_hostname }}/"
+        flat: true
+
+    - name: Récupérer le résultat XML
+      ansible.builtin.fetch:
+        src: "{{ scap_results_file }}"
+        dest: "./artifacts/{{ inventory_hostname }}/"
+        flat: true
+
+    # ---------------------------------------------------------
+    # FINAL STATUS
+    # ---------------------------------------------------------
+
+    - name: Résumé de l'audit
+      ansible.builtin.debug:
+        msg:
+          - "============================================"
+          - " RHEL 10 CIS LEVEL 2 AUDIT"
+          - "============================================"
+          - "Host    : {{ inventory_hostname }}"
+          - "Profile : {{ scap_profile }}"
+          - "XML     : {{ scap_results_file }}"
+          - "HTML    : {{ scap_report_file }}"
+          - "Return  : {{ openscap_result.rc }}"
+       
