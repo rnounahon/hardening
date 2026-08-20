@@ -1,6 +1,6 @@
 ---
 - name: RHEL 10 - CIS Level 2 - OpenSCAP Audit
-  hosts: all
+  hosts: '{{ inventory_hostname | default("localhost") }}'
   become: true
   gather_facts: true
 
